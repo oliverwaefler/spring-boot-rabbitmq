@@ -2,7 +2,7 @@
 
 ## Description
 
-Simple spring boot application to interact with a Solace PubSub+ message broker using annotations.
+Simple spring boot application to interact with a RabbitMQ message broker using annotations.
 
 ## Getting Started
 
