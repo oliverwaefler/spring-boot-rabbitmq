@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
@@ -19,12 +18,6 @@ class RestController(val rabbitTemplate: RabbitTemplate,
 		private val logger = KotlinLogging.logger {}
 	}
 
-	@GetMapping("/test")
-	fun test(): String {
-		logger.info { "test" }
-		return "bla"
-	}
-
 	@PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], value = ["/queue"])
 	fun postQueue(@RequestBody myData: MyData) {
 		logger.debug { "Sending $myData to queue - $queueName" }
@@ -34,15 +27,7 @@ class RestController(val rabbitTemplate: RabbitTemplate,
 
 	@PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], value = ["/topic"])
 	fun postTopic(@RequestBody myData: MyData) {
-		val routingKey = "bla.blae"
-		logger.debug { "Sending $myData to topic - $topicName" }
-		rabbitTemplate.convertAndSend(topicName, routingKey, Klaxon().toJsonString(myData))
-		logger.info { "Sent $myData topic: $topicName key: $routingKey" }
-	}
-
-	@PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE], value = ["/postPubSub"])
-	fun postPubSub(@RequestBody myData: MyData) {
-		val fanoutExchange = "pubsub"
+		val fanoutExchange = "amq.fanout"
 		logger.debug { "Sending $myData to topic - $fanoutExchange" }
 		rabbitTemplate.convertAndSend(fanoutExchange, "", Klaxon().toJsonString(myData))
 		logger.info { "Sent $myData topic: $fanoutExchange" }

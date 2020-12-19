@@ -17,66 +17,42 @@ class RabbitMQConsumer {
 
 	@RabbitListener(queues = ["\${rabbitmq.target.queue}"])
 	fun consumeQueue1(message: MyData) {
-		logger.info { "consumeQueue1 $message" }
+		logger.info { "consumeQueue1: $message" }
 	}
 
 	@RabbitListener(queues = ["\${rabbitmq.target.queue}"])
 	fun consumeQueue2(message: MyData) {
-		logger.info { "consumeQueue2 $message" }
+		logger.info { "consumeQueue2: $message" }
 	}
 
-	@RabbitListener(
-			bindings = [QueueBinding(
-					value = Queue(value = "topic1", durable = true.toString()),
-					exchange = Exchange(value = "amq.topic", ignoreDeclarationExceptions = "true", type = ExchangeTypes.TOPIC),
-					key = ["*.bla"]
-			)]
-	)
-	fun listenToTopic1(message: MyData) {
-		logger.info { "listenToTopic1: $message" }
-	}
-
-	@RabbitListener(
-			bindings = [QueueBinding(
-					value = Queue(value = "tmp", durable = false.toString(), autoDelete = true.toString()),
-					exchange = Exchange(value = "amq.topic", ignoreDeclarationExceptions = true.toString(), type = ExchangeTypes.TOPIC),
-					key = ["bla.*"]
-			)]
-	)
-	fun listenToTopic2(message: MyData) {
-		logger.info { "listenToTopic2: $message" }
-	}
-
-	//PUB SUB mit Fanout
 	@RabbitListener(
 			bindings = [QueueBinding(
 					value = Queue(value = "tmpPubSub1", autoDelete = true.toString()),
-					exchange = Exchange(value = "pubsub", type = ExchangeTypes.FANOUT)
+					exchange = Exchange(value = "amq.fanout", type = ExchangeTypes.FANOUT)
 			)]
 	)
-	fun listenToPubSub1(message: MyData) {
-		logger.info { "listenToPubSub1: $message" }
+	fun consumeTopic1(message: MyData) {
+		logger.info { "consumeTopic1: $message" }
 	}
 
 	@RabbitListener(
 			bindings = [QueueBinding(
 					value = Queue(value = "tmpPubSub2", autoDelete = true.toString()),
-					exchange = Exchange(value = "pubsub", type = ExchangeTypes.FANOUT)
+					exchange = Exchange(value = "amq.fanout", type = ExchangeTypes.FANOUT)
 			)]
 	)
-	fun listenToPubSub2(message: MyData) {
-		logger.info { "listenToPubSub2: $message" }
+	fun consumeTopic2(message: MyData) {
+		logger.info { "consumeTopic2: $message" }
 	}
 
-	//RPC
 	@RabbitListener(
 			bindings = [QueueBinding(
 					value = Queue(value = "tmpRequestResponse", autoDelete = true.toString()),
 					exchange = Exchange(value = "amq.direct"), key = ["rpc.date"]
 			)]
 	)
-	fun listenToRPC(message: MyData): String {
-		logger.info { "listenToRPC: $message" }
+	fun consumeRPC(message: MyData): String {
+		logger.info { "consumeRPC: $message" }
 		val response = Date().toString()
 		logger.info { "returning: $response" }
 		return response
